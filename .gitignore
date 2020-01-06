@@ -1,0 +1,9 @@
+# OS X
+.DS_Store
+
+# Python
+*.pyc
+*.pyo
+
+# news_archive
+news_archive_config.py
