@@ -5,5 +5,11 @@
 *.pyc
 *.pyo
 
+# virtualenv
+*venv*
+
+# mypy
+.mypy_cache
+
 # news_archive
 news_archive_config.py

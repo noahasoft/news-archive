@@ -5,10 +5,10 @@ import imaplib
 import json
 import subprocess
 import sys
-from typing import Optional
+from typing import List, Optional
 
 
-def main(args) -> None:
+def main(args: List[str]) -> None:
     simulate = '--test' in args
     verbose = '--verbose' in args
     
@@ -42,16 +42,16 @@ def _run(verbose: bool) -> None:
         #criteria = 'ALL'  # for debugging
         (status, data) = imap.search(None, criteria)
         assert status.startswith('OK')
-        message_ids = data[0].split()  # ex: [b'1', b'2'] or []
+        message_ids = [str(x) for x in data[0].split()]  # ex: ['1', '2'] or []
 
         # Move messages
         if len(message_ids) > 0:
             if verbose: print('Moving %d message(s)...' % len(message_ids))
             
-            (status, data) = imap.copy(b':'.join(message_ids), config.TO_MAILBOX)
+            (status, data) = imap.copy(':'.join(message_ids), config.TO_MAILBOX)
             assert status.startswith('OK')
             
-            (status, data) = imap.store(b':'.join(message_ids), '+FLAGS', '\\Deleted')
+            (status, data) = imap.store(':'.join(message_ids), '+FLAGS', '\\Deleted')
             assert status.startswith('OK')
     finally:
         imap.logout()
@@ -60,9 +60,9 @@ def _run(verbose: bool) -> None:
 def _format_rfc2822_date(date: datetime.date) -> str:
     month_name = [
         None,
-        "Jan", "Feb", "Mar", "Apr",
-        "May", "Jun", "Jul", "Aug",
-        "Sep", "Oct", "Nov", "Dec",
+        'Jan', 'Feb', 'Mar', 'Apr',
+        'May', 'Jun', 'Jul', 'Aug',
+        'Sep', 'Oct', 'Nov', 'Dec',
     ][date.month]
     return '%d-%s-%d' % (date.day, month_name, date.year)
 
