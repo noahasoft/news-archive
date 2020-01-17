@@ -42,17 +42,18 @@ def _run(verbose: bool) -> None:
         #criteria = 'ALL'  # for debugging
         (status, data) = imap.search(None, criteria)
         assert status.startswith('OK')
-        message_ids = [str(x) for x in data[0].split()]  # ex: ['1', '2'] or []
+        message_ids = [x.decode('ascii') for x in data[0].split()]  # ex: ['1', '2'] or []
 
         # Move messages
         if len(message_ids) > 0:
             if verbose: print('Moving %d message(s)...' % len(message_ids))
             
-            (status, data) = imap.copy(':'.join(message_ids), config.TO_MAILBOX)
-            assert status.startswith('OK')
-            
-            (status, data) = imap.store(':'.join(message_ids), '+FLAGS', '\\Deleted')
-            assert status.startswith('OK')
+            for message_id in message_ids:
+                (status, data) = imap.copy(message_id, config.TO_MAILBOX)
+                assert status.startswith('OK')
+                
+                (status, data) = imap.store(message_id, '+FLAGS', '\\Deleted')
+                assert status.startswith('OK')
     finally:
         imap.logout()
 
