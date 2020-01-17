@@ -40,19 +40,19 @@ def _run(verbose: bool) -> None:
         # Search for messages to move
         criteria = '(BEFORE %s)' % _format_rfc2822_date(min_date)
         #criteria = 'ALL'  # for debugging
-        (status, data) = imap.search(None, criteria)
+        (status, data) = imap.uid('SEARCH', None, criteria)
         assert status.startswith('OK')
-        message_ids = [x.decode('ascii') for x in data[0].split()]  # ex: ['1', '2'] or []
+        message_ids = [x for x in data[0].decode('ascii').split()]  # ex: ['1', '2'] or []
 
         # Move messages
         if len(message_ids) > 0:
             if verbose: print('Moving %d message(s)...' % len(message_ids))
             
             for message_id in message_ids:
-                (status, data) = imap.copy(message_id, config.TO_MAILBOX)
+                (status, data) = imap.uid('COPY', message_id, config.TO_MAILBOX)
                 assert status.startswith('OK')
                 
-                (status, data) = imap.store(message_id, '+FLAGS', '\\Deleted')
+                (status, data) = imap.uid('STORE', message_id, '+FLAGS', '\\Deleted')
                 assert status.startswith('OK')
     finally:
         imap.logout()
